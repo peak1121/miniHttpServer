@@ -17,6 +17,7 @@ C++ 系统文件
 
 #include "Types.h"
 #include "Atomic.h"
+#include "CountDownLatch.h"
 namespace peak {
 
 class Thread {
@@ -47,8 +48,10 @@ private:
     pid_t      tid_;
     ThreadFunc func_;
     string     name_;
+    CountDownLatch latch_;//用于通知主线程 本线程初始化完毕
 
     static AtomicInt32 numCreated_;
+    
 };
 }//namespace peak
 

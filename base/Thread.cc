@@ -2,7 +2,7 @@
 
 #include <unistd.h>
 #include <sys/syscall.h>
-
+#include <sys/prctl.h>
 #include "CurrentThread.h"
 #include "Timestamp.h"
 namespace peak {
@@ -18,18 +18,26 @@ struct ThreadData {
     ThreadFunc func_;
     string name_;
     pid_t* tid_;
+    CountDownLatch* latch_;
 
     ThreadData(ThreadFunc func,
              const string& name,
-             pid_t* tid)
+             pid_t* tid,
+             CountDownLatch* latch)
     : func_(std::move(func)),
       name_(name),
-      tid_(tid)
+      tid_(tid),
+      latch_(latch)
   { }
     void runInThread() {
-        *tid_ = peak::CurrentThread::tid();
+        *tid_ = peak::CurrentThread::tid();//将Thread类的tid保存为当前线程tid
         tid_ = NULL;
+        latch_->countDown();////将Thread类的计数减1，通知主线程可以继续执行了
+        latch_ = NULL;
+         peak::CurrentThread::t_threadName = name_.empty() ? "peakThread" : name_.c_str();
+         ::prctl(PR_SET_NAME, peak::CurrentThread::t_threadName);//设置进程名字
         func_();
+        peak::CurrentThread::t_threadName = "finished";
     }
 };
 
@@ -75,7 +83,7 @@ Thread::Thread(ThreadFunc func, const string& n)
     pthreadId_(0),
     tid_(0),
     func_(std::move(func)),
-    name_(n)
+    name_(n), latch_(1)
 {
   setDefaultName();
 }
@@ -88,9 +96,13 @@ Thread::~Thread() {
 
 void Thread::start() {
     started_ = true;
-    detail::ThreadData* data = new detail::ThreadData(func_, name_, &tid_);
+    detail::ThreadData* data = new detail::ThreadData(func_, name_, &tid_, &latch_);
     if (pthread_create(&pthreadId_, NULL, &detail::startThread, data)) {
         started_ = false;
+        delete data; 
+    }
+    else {
+      latch_.wait();//创建者等待子线程创建成功
     }
 }
 
