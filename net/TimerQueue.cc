@@ -44,7 +44,8 @@ struct timespec howMuchTimeFromNow(Timestamp when)
 void readTimerfd(int timerfd, Timestamp now)
 {
   uint64_t howmany;
-  ssize_t n = ::read(timerfd, &howmany, sizeof howmany);
+  ::read(timerfd, &howmany, sizeof howmany);
+  // ssize_t n = ::read(timerfd, &howmany, sizeof howmany);
   // LOG_TRACE << "TimerQueue::handleRead() " << howmany << " at " << now.toString();
   // if (n != sizeof howmany)
   {
@@ -71,6 +72,8 @@ void resetTimerfd(int timerfd, Timestamp expiration)
 }  // namespace net
 }  // namespace peak
 
+
+//**********以下为成员函数**************
 using namespace peak;
 using namespace peak::net;
 using namespace peak::net::detail;
@@ -83,13 +86,13 @@ TimerQueue::TimerQueue(EventLoop* loop)
     callingExpiredTimers_(false)
 {
   timerfdChannel_.setReadCallback( std::bind(&TimerQueue::handleRead, this));
-  timerfdChannel_.enableReading(); //可读事件加入关注
+  timerfdChannel_.enableReading(); //将定时器channel的加入到所属eventloop的pooller的通道列表，关注事件为可读
 }
 
 TimerQueue::~TimerQueue()
 {
   timerfdChannel_.disableAll();
-  timerfdChannel_.remove();
+  timerfdChannel_.remove();//将channel从所属eventloop的poller的通道列表中移除
   ::close(timerfd_);
 
   for (const Entry& timer : timers_)

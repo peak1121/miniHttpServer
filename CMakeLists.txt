@@ -45,3 +45,6 @@ include_directories(${PROJECT_SOURCE_DIR})
 include_directories(base)
 add_subdirectory(base)
 
+include_directories(net)
+add_subdirectory(net)
+

@@ -42,11 +42,10 @@ class IgnoreSigPipe
     // LOG_TRACE << "Ignore SIGPIPE";
   }
 };
-
-
 IgnoreSigPipe initObj;//全局变量会在main之前执行以忽略SIGPIPE信号
 }  // namespace
 
+//以下是成员函数
 EventLoop* EventLoop::getEventLoopOfCurrentThread()
 {
   return t_loopInThisThread;
@@ -216,9 +215,9 @@ bool EventLoop::hasChannel(Channel* channel)
 
 void EventLoop::abortNotInLoopThread()
 {
-  LOG_FATAL << "EventLoop::abortNotInLoopThread - EventLoop " << this
-            << " was created in threadId_ = " << threadId_
-            << ", current thread id = " <<  CurrentThread::tid();
+  // LOG_FATAL << "EventLoop::abortNotInLoopThread - EventLoop " << this
+  //           << " was created in threadId_ = " << threadId_
+  //           << ", current thread id = " <<  CurrentThread::tid();
 }
 
 void EventLoop::wakeup()
@@ -260,9 +259,9 @@ void EventLoop::doPendingFunctors()
 
 void EventLoop::printActiveChannels() const
 {
-  for (const Channel* channel : activeChannels_)
-  {
-    LOG_TRACE << "{" << channel->reventsToString() << "} ";
-  }
+  // for (const Channel* channel : activeChannels_)
+  // {
+  //   // LOG_TRACE << "{" << channel->reventsToString() << "} ";
+  // }
 }
 

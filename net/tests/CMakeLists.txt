@@ -1,8 +1,6 @@
-add_executable(thread_test Thread_test.cc)
-target_link_libraries(thread_test base)
+add_executable(eventloop_unittest EventLoop_unittest.cc)
+target_link_libraries(eventloop_unittest net)
 
-add_executable(threadPool_test threadPool_test.cc)
-target_link_libraries(threadPool_test base)
 
 
 

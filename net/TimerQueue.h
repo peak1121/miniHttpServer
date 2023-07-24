@@ -1,15 +1,13 @@
 #ifndef HTTPSERVER_NET_TIMERQUEUE_H
 #define HTTPSERVER_NET_TIMERQUEUE_H
 
+#include <set>
+#include <vector>
+
 #include "base/Mutex.h"
 #include "base/Timestamp.h"
 #include "Callbacks.h"
 #include "Channel.h"
-
-#include <set>
-#include <vector>
-
-
 
 namespace peak
 {
